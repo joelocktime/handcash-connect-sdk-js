@@ -38,14 +38,29 @@ class HttpRequestFactory {
       if (endpoint.indexOf(runExtensionEndpoint) !== -1) {
          headers['app-secret'] = this.appSecret;
       }
-      return {
+
+      // Temporary workaround suggested by BrandonB
+      const baseRequest = {
          baseURL: this.baseApiEndpoint,
          url: endpoint,
          method,
          headers,
-         data: serializedBody,
          responseType: 'json',
       };
+
+      if (method === 'GET') {
+         return {
+            ...baseRequest,
+            params: {
+               body: serializedBody
+            }
+         }
+      } else {
+         return {
+            ...baseRequest,
+            data: serializedBody
+         }
+      }
    }
 
    static _getRequestSignature(method, endpoint, serializedBody, timestamp, privateKey) {
